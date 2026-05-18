@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - EZStay</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <section class="booking-section" style="min-height:100vh; display:flex; align-items:center;">
+        <div class="container" style="max-width:620px; width:100%;">
+            <form method="post" class="booking-form">
+                {% csrf_token %}
+                <h2 class="section-title" style="margin-bottom:16px;">Create account</h2>
+                {% if form.errors %}
+                    <div class="message error">Please correct the errors below.</div>
+                {% endif %}
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label for="id_username">Username</label>
+                    {{ form.username }}
+                    {% for error in form.username.errors %}<small style="color:#b91c1c;">{{ error }}</small>{% endfor %}
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="margin-bottom:12px;">
+                        <label for="id_first_name">First Name</label>
+                        {{ form.first_name }}
+                        {% for error in form.first_name.errors %}<small style="color:#b91c1c;">{{ error }}</small>{% endfor %}
+                    </div>
+                    <div class="form-group" style="margin-bottom:12px;">
+                        <label for="id_last_name">Last Name</label>
+                        {{ form.last_name }}
+                        {% for error in form.last_name.errors %}<small style="color:#b91c1c;">{{ error }}</small>{% endfor %}
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label for="id_email">Email</label>
+                    {{ form.email }}
+                    {% for error in form.email.errors %}<small style="color:#b91c1c;">{{ error }}</small>{% endfor %}
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label for="id_password1">Password</label>
+                    {{ form.password1 }}
+                    {% for error in form.password1.errors %}<small style="color:#b91c1c;">{{ error }}</small>{% endfor %}
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label for="id_password2">Confirm Password</label>
+                    {{ form.password2 }}
+                    {% for error in form.password2.errors %}<small style="color:#b91c1c;">{{ error }}</small>{% endfor %}
+                </div>
+                <button type="submit" class="btn btn-primary btn-large">Sign Up</button>
+                <p style="margin-top:12px; text-align:center;">Already have an account? <a href="{% url 'login' %}">Login</a></p>
+                <p style="margin-top:8px; text-align:center;"><a href="{% url 'home' %}">Back to home</a></p>
+            </form>
+        </div>
+    </section>
+</body>
+</html>

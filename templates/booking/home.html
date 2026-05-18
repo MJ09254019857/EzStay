@@ -1,0 +1,253 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EZStay - Book Your Perfect Stay</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <span class="logo-icon">
+                  <img src="{% static 'images/logo.jpg' %}" alt="Logo" width="40">
+                  </span>
+                <span class="logo-text">EZStay</span>
+            </div>
+            <nav class="nav">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#properties" class="nav-link">Properties</a>
+                <a href="#booking" class="nav-link">Book Now</a>
+                <a href="#contact" class="nav-link">Contact</a>
+            </nav>
+            <div style="display:flex; gap:8px;">
+                {% if user.is_authenticated %}
+                    <span style="align-self:center; font-size:14px;">Hi, {{ user.username }}</span>
+                    {% if user.is_staff %}
+                        <a class="btn btn-outline" href="{% url 'admin_dashboard' %}">Dashboard</a>
+                    {% endif %}
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button class="btn btn-outline" type="submit">Logout</button>
+                    </form>
+                {% else %}
+                    <a class="btn btn-outline" href="{% url 'login' %}">Login</a>
+                    <a class="btn btn-primary" href="{% url 'signup' %}">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Find Your Perfect Stay</h1>
+            <p>Discover comfortable and affordable accommodations for your next adventure</p>
+        </div>
+    </section>
+
+    <section id="properties" class="properties">
+        <div class="container">
+            {% if messages %}
+                <div style="margin-bottom:16px;">
+                    {% for message in messages %}
+                        <div class="message {{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <h2 class="section-title">Featured Properties</h2>
+            <p class="section-subtitle">Explore our top-rated accommodations</p>
+
+            <div class="property-grid">
+                <div class="property-card">
+                    <div class="property-image">
+                        <img src="{% static 'images/aprilrose.jpg' %}" alt="APRIL ROSE LODGING HOUSE">
+                        <span class="property-badge">Popular</span>
+                    </div>
+                    <div class="property-info">
+                        <h3>APRIL ROSE LODGING HOUSE</h3>
+                        <p class="property-location">📍 Baybay, San Pedro, SDS</p>
+                        <div class="property-price"><span class="price">300</span><span class="per-night">/ night</span></div>
+                        <button class="btn btn-primary book-property-btn" data-property="april-rose">Book Now</button>
+                    </div>
+                </div>
+
+                <div class="property-card">
+                    <div class="property-image">
+                        <img src="{% static 'images/jra.jpg' %}" alt="JRA TRAVELLERS INN">
+                        <span class="property-badge">Superhost</span>
+                    </div>
+                    <div class="property-info">
+                        <h3>JRA TRAVELLERS INN</h3>
+                        <p class="property-location">📍 Tapa, Cantilan SDS</p>
+                        <div class="property-price"><span class="price">500</span><span class="per-night">/ night</span></div>
+                        <button class="btn btn-primary book-property-btn" data-property="beach-villa">Book Now</button>
+                    </div>
+                </div>
+
+                <div class="property-card">
+                    <div class="property-image">
+                        <img src="{% static 'images/sunrise.jpg' %}" alt="SUNRISE LODGING">
+                        <span class="property-badge">Cozy</span>
+                    </div>
+                    <div class="property-info">
+                        <h3>SUNRISE LODGING</h3>
+                        <p class="property-location">📍 Baybay, San Pedro SDS</p>
+                        <div class="property-price"><span class="price">195</span><span class="per-night">/ night</span></div>
+                        <button class="btn btn-primary book-property-btn" data-property="sunrise">Book Now</button>
+                    </div>
+                </div>
+
+                <div class="property-card">
+                    <div class="property-image">
+                        <img src="{% static 'images/kwartoderenta.jpg' %}" alt="Kwarto de Renta Apartelle">
+                        <span class="property-badge">New</span>
+                    </div>
+                    <div class="property-info">
+                        <h3>Kwarto de Renta Apartelle</h3>
+                        <p class="property-location">📍 Mangosilom, Cantilan, Surigao del Sur</p>
+                        <div class="property-price"><span class="price">120</span><span class="per-night">/ night</span></div>
+                        <button class="btn btn-primary book-property-btn" data-property="urban-loft">Book Now</button>
+                    </div>
+                </div>
+
+                <div class="property-card property-card-featured">
+                    <div class="property-image">
+                        <img src="{% static "images/cerila's.jpg" %}" alt="Cerila's Lodging House">
+                        <span class="property-badge">Featured</span>
+                    </div>
+                    <div class="property-info">
+                        <h3>Cerila's Lodging House</h3>
+                        <p class="property-location">📍 Baybay, San Pedro, Cantilan, Surigao del Sur</p>
+                        <div class="property-price"><span class="price">350</span><span class="per-night">/ night</span></div>
+                        <button class="btn btn-primary book-property-btn" data-property="riverside-garden">Book Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="booking" class="booking-section">
+        <div class="container">
+            <h2 class="section-title">Book Your Stay</h2>
+            <p class="section-subtitle">Complete your reservation in a few simple steps</p>
+
+            {% if not user.is_authenticated %}
+                <p class="section-subtitle">Please <a href="{% url 'login' %}">login</a> or <a href="{% url 'signup' %}">sign up</a> to submit your booking.</p>
+            {% endif %}
+
+            <div class="booking-container">
+                <form class="booking-form" method="post" action="{% url 'create_booking' %}">
+                    {% csrf_token %}
+                    <div class="form-section">
+                        <h3>Reservation Details</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="property-select">Select Property</label>
+                                <select id="property-select" name="property_slug" required>
+                                    <option value="">Choose a property...</option>
+                                    <option value="april-rose">APRIL ROSE LODGING HOUSE - 300/night</option>
+                                    <option value="beach-villa">JRA TRAVELLERS INN - 500/night</option>
+                                    <option value="sunrise">SUNRISE LODGING - 195/night</option>
+                                    <option value="urban-loft">Kwarto de Renta Apartelle - 120/night</option>
+                                    <option value="riverside-garden">Cerila's Lodging House - 350/night</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="booking-checkin">Check-in Date</label>
+                                <input type="date" id="booking-checkin" name="checkin" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="booking-checkout">Check-out Date</label>
+                                <input type="date" id="booking-checkout" name="checkout" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="booking-guests">Number of Guests</label>
+                                <select id="booking-guests" name="guests" required>
+                                    <option value="1">1 Guest</option>
+                                    <option value="2" selected>2 Guests</option>
+                                    <option value="3">3 Guests</option>
+                                    <option value="4">4 Guests</option>
+                                    <option value="5">5 Guests</option>
+                                    <option value="6">6+ Guests</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Personal Information</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="first-name">First Name</label>
+                                <input type="text" id="first-name" name="first_name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="last-name">Last Name</label>
+                                <input type="text" id="last-name" name="last_name" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" name="phone" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Special Requests</h3>
+                        <div class="form-group">
+                            <label for="requests">Additional Notes (Optional)</label>
+                            <textarea id="requests" name="requests" rows="4"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="booking-summary">
+                        <h3>Booking Summary</h3>
+                        <div class="summary-row"><span>Property:</span><span id="summary-property">Not selected</span></div>
+                        <div class="summary-row"><span>Nights:</span><span id="summary-nights">0</span></div>
+                        <div class="summary-row"><span>Rate per night:</span><span id="summary-rate">0</span></div>
+                        <div class="summary-row"><span>Service fee:</span><span id="summary-fee">0</span></div>
+                        <div class="summary-row total"><span>Total:</span><span id="summary-total">0</span></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-large">Complete Booking</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">Get in Touch</h2>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>Contact Information</h3>
+                    <p>📍 Cantilan, Surigao del Sur</p>
+                    <p>📞 +639660124817</p>
+                    <p>✉️ ezstaybooking@gmail.com</p>
+                </div>
+                <div class="contact-form">
+                    <p>Need help with a reservation? Reach us any time.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="{% static 'js/django_app.js' %}"></script>
+</body>
+</html>

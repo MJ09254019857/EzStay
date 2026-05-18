@@ -1,0 +1,161 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - EZStay</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <section class="booking-section" style="min-height:100vh; display:flex; align-items:center;">
+        <div class="container" style="max-width:760px; width:100%;">
+            <div class="logo" style="display:flex; align-items:center; gap:14px; justify-content:center; margin-bottom:24px;">
+                <span class="logo-icon" style="display:inline-flex; align-items:center; justify-content:center;">
+                    <img src="{% static 'images/logo.jpg' %}" alt="EZStay Logo" width="88" height="88" style="object-fit:cover; border-radius:14px;">
+                </span>
+                <span class="logo-text" style="font-size:34px; line-height:1;">EZStay</span>
+            </div>
+
+            {% if messages %}
+                <div style="margin-bottom:16px;">
+                    {% for message in messages %}
+                        <div class="message {{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="post" class="booking-form">
+                {% csrf_token %}
+                <h2 class="section-title" style="margin-bottom:16px;">Complete Payment</h2>
+                <p class="section-subtitle" style="margin-bottom:24px;">Booking #EZS-{{ booking.id|stringformat:'06d' }} · {{ booking.get_property_slug_display }}</p>
+
+                <div class="booking-summary" style="margin-bottom:24px;">
+                    <h3>Amount Due</h3>
+                    <div class="summary-row"><span>Stay:</span><span>{{ booking.nights }} night{{ booking.nights|pluralize }}</span></div>
+                    <div class="summary-row"><span>Rate per night:</span><span>${{ booking.rate }}</span></div>
+                    <div class="summary-row"><span>Service fee:</span><span>${{ booking.service_fee }}</span></div>
+                    <div class="summary-row total"><span>Total:</span><span>${{ booking.total }}</span></div>
+                </div>
+
+                <div class="form-section" style="margin-bottom:16px;">
+                    <h3>Payment Method</h3>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; margin-bottom:14px;">
+                        <label for="method-gcash" style="display:flex; align-items:center; gap:10px; border:1px solid #e5e7eb; border-radius:10px; padding:10px 12px; background:#fff; cursor:pointer;">
+                            <span style="width:28px; height:28px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; background:#007dff; color:#fff; font-size:11px; font-weight:700;">G</span>
+                            <span style="font-weight:600;">GCash</span>
+                        </label>
+                        <label for="method-maya" style="display:flex; align-items:center; gap:10px; border:1px solid #e5e7eb; border-radius:10px; padding:10px 12px; background:#fff; cursor:pointer;">
+                            <span style="width:28px; height:28px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; background:#00d17d; color:#052e16; font-size:11px; font-weight:800;">M</span>
+                            <span style="font-weight:600;">Maya</span>
+                        </label>
+                        <label for="method-card" style="display:flex; align-items:center; gap:10px; border:1px solid #e5e7eb; border-radius:10px; padding:10px 12px; background:#fff; cursor:pointer;">
+                            <span style="width:28px; height:28px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; background:#111827; color:#fff; font-size:10px; font-weight:700;">CARD</span>
+                            <span style="font-weight:600;">Credit/Debit</span>
+                        </label>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:14px;">
+                        <label for="payment-method">Choose your payment method</label>
+                        <select id="payment-method" name="payment_method" required>
+                            <option value="">Select a method</option>
+                            <option value="gcash">GCash</option>
+                            <option value="maya">Maya (PayMaya)</option>
+                            <option value="card">Credit/Debit Card</option>
+                        </select>
+                    </div>
+
+                    <div style="display:none;">
+                        <input id="method-gcash" type="radio" name="payment_method_card" value="gcash">
+                        <input id="method-maya" type="radio" name="payment_method_card" value="maya">
+                        <input id="method-card" type="radio" name="payment_method_card" value="card">
+                    </div>
+
+                    <div id="wallet-fields" style="display:none;">
+                        <div class="form-group" style="margin-bottom:14px;">
+                            <label for="wallet-number">Mobile Number</label>
+                            <input id="wallet-number" name="wallet_number" type="text" inputmode="numeric" minlength="11" maxlength="11" placeholder="09XXXXXXXXX">
+                        </div>
+                    </div>
+
+                    <div id="card-fields" style="display:none;">
+                        <div class="form-group" style="margin-bottom:14px;">
+                            <label for="card-name">Cardholder Name</label>
+                            <input id="card-name" name="card_name" type="text">
+                        </div>
+                        <div class="form-group" style="margin-bottom:14px;">
+                            <label for="card-number">Card Number</label>
+                            <input id="card-number" name="card_number" type="text" inputmode="numeric" minlength="13" maxlength="19">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="expiry">Expiry (MM/YY)</label>
+                                <input id="expiry" name="expiry" type="text" placeholder="MM/YY" maxlength="5">
+                            </div>
+                            <div class="form-group">
+                                <label for="cvv">CVV</label>
+                                <input id="cvv" name="cvv" type="password" inputmode="numeric" minlength="3" maxlength="4">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-large">Pay Now</button>
+                <p style="margin-top:12px; text-align:center;"><a href="{% url 'home' %}">Cancel and return home</a></p>
+            </form>
+        </div>
+    </section>
+
+    <script>
+        (function () {
+            const methodSelect = document.getElementById('payment-method');
+            const walletFields = document.getElementById('wallet-fields');
+            const cardFields = document.getElementById('card-fields');
+            const walletNumber = document.getElementById('wallet-number');
+            const cardName = document.getElementById('card-name');
+            const cardNumber = document.getElementById('card-number');
+            const expiry = document.getElementById('expiry');
+            const cvv = document.getElementById('cvv');
+            const methodGcash = document.getElementById('method-gcash');
+            const methodMaya = document.getElementById('method-maya');
+            const methodCard = document.getElementById('method-card');
+
+            function toggleFields() {
+                const value = methodSelect.value;
+
+                if (value === 'gcash' || value === 'maya') {
+                    walletFields.style.display = 'block';
+                    cardFields.style.display = 'none';
+                    walletNumber.required = true;
+                    cardName.required = false;
+                    cardNumber.required = false;
+                    expiry.required = false;
+                    cvv.required = false;
+                } else if (value === 'card') {
+                    walletFields.style.display = 'none';
+                    cardFields.style.display = 'block';
+                    walletNumber.required = false;
+                    cardName.required = true;
+                    cardNumber.required = true;
+                    expiry.required = true;
+                    cvv.required = true;
+                } else {
+                    walletFields.style.display = 'none';
+                    cardFields.style.display = 'none';
+                    walletNumber.required = false;
+                    cardName.required = false;
+                    cardNumber.required = false;
+                    expiry.required = false;
+                    cvv.required = false;
+                }
+            }
+
+            methodSelect.addEventListener('change', toggleFields);
+            methodGcash.addEventListener('change', function () { methodSelect.value = 'gcash'; toggleFields(); });
+            methodMaya.addEventListener('change', function () { methodSelect.value = 'maya'; toggleFields(); });
+            methodCard.addEventListener('change', function () { methodSelect.value = 'card'; toggleFields(); });
+            toggleFields();
+        })();
+    </script>
+</body>
+</html>

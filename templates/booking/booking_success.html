@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmed - EZStay</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <section class="booking-section" style="min-height:100vh; display:flex; align-items:center;">
+        <div class="container" style="max-width:760px; width:100%;">
+            {% if messages %}
+                <div style="margin-bottom:16px;">
+                    {% for message in messages %}
+                        <div class="message {{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="booking-form" style="text-align:center;">
+                <h2 class="section-title" style="margin-bottom:8px; color:#10b981;">Booking Confirmed ✅</h2>
+                <p class="section-subtitle" style="margin-bottom:24px;">Your payment has been received and your reservation is confirmed.</p>
+
+                <div class="booking-summary" style="text-align:left; margin-bottom:24px;">
+                    <h3>Reservation Details</h3>
+                    <div class="summary-row"><span>Confirmation #:</span><span>EZS-{{ booking.id|stringformat:'06d' }}</span></div>
+                    <div class="summary-row"><span>Payment Ref:</span><span>{{ booking.payment_reference }}</span></div>
+                    <div class="summary-row"><span>Property:</span><span>{{ booking.get_property_slug_display }}</span></div>
+                    <div class="summary-row"><span>Guest:</span><span>{{ booking.first_name }} {{ booking.last_name }}</span></div>
+                    <div class="summary-row"><span>Dates:</span><span>{{ booking.checkin }} to {{ booking.checkout }}</span></div>
+                    <div class="summary-row"><span>Total Paid:</span><span>${{ booking.total }}</span></div>
+                </div>
+
+                <a href="{% url 'home' %}" class="btn btn-primary">Back to Home</a>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EZStay - Book Your Perfect Stay</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <span class="logo-icon">🏠</span>
+                <span class="logo-text">EZStay</span>
+            </div>
+            <nav class="nav">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#properties" class="nav-link">Properties</a>
+                <a href="#booking" class="nav-link">Book Now</a>
+                <a href="#contact" class="nav-link">Contact</a>
+            </nav>
+            <button class="btn btn-outline">Sign In</button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Find Your Perfect Stay</h1>
+            <p>Discover comfortable and affordable accommodations for your next adventure</p>
+            <div class="search-box">
+                <div class="search-field">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" placeholder="Where are you going?">
+                </div>
+                <div class="search-field">
+                    <label for="checkin">Check-in</label>
+                    <input type="date" id="checkin">
+                </div>
+                <div class="search-field">
+                    <label for="checkout">Check-out</label>
+                    <input type="date" id="checkout">
+                </div>
+                <div class="search-field">
+                    <label for="guests">Guests</label>
+                    <select id="guests">
+                        <option value="1">1 Guest</option>
+                        <option value="2">2 Guests</option>
+                        <option value="3">3 Guests</option>
+                        <option value="4">4+ Guests</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary search-btn">Search</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Properties -->
+    <section id="properties" class="properties">
+        <div class="container">
+            <h2 class="section-title">Featured Properties</h2>
+            <p class="section-subtitle">Explore our top-rated accommodations</p>
+            
+            <div class="property-grid">
+                <!-- Property Card 1 -->
+                <div class="property-card">
+                    <div class="property-image">
+                        <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=300&fit=crop" alt="Modern Apartment">
+                        <span class="property-badge">Popular</span>
+                        <button class="wishlist-btn">♡</button>
+                    </div>
+                    <div class="property-info">
+                        <h3>APRIL ROSE LODGING HOUSE</h3>
+                        <p class="property-location">📍 Baybay, San Pedro, SDS</p>
+                        <div class="property-amenities">
+                            <span>🛏️ 2 Beds</span>
+                            <span>🛁 1 Bath</span>
+                            <span>👥 4 Guests</span>
+                        </div>
+                        <div class="property-rating">
+                            <span class="rating">⭐ 4.9</span>
+                            <span class="reviews">(128 reviews)</span>
+                        </div>
+                        <div class="property-price">
+                            <span class="price">300</span>
+                            <span class="per-night">/ night</span>
+                        </div>
+                        <button class="btn btn-primary book-property-btn">Book Now</button>
+                    </div>
+                </div>
+
+                <!-- Property Card 2 -->
+                <div class="property-card">
+                    <div class="property-image">
+                        <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=300&fit=crop" alt="Beach Villa">
+                        <span class="property-badge">Superhost</span>
+                        <button class="wishlist-btn">♡</button>
+                    </div>
+                    <div class="property-info">
+                        <h3>Luxury Beach Villa</h3>
+                        <p class="property-location">📍 Tapa, Cantilan SDS</p>
+                        <div class="property-amenities">
+                            <span>🛏️ 3 Beds</span>
+                            <span>🛁 2 Baths</span>
+                            <span>👥 6 Guests</span>
+                        </div>
+                        <div class="property-rating">
+                            <span class="rating">⭐ 4.8</span>
+                            <span class="reviews">(95 reviews)</span>
+                        </div>
+                        <div class="property-price">
+                            <span class="price">500</span>
+                            <span class="per-night">/ night</span>
+                        </div>
+                        <button class="btn btn-primary book-property-btn">Book Now</button>
+                    </div>
+                </div>
+
+                <!-- Property Card 3 -->
+                <div class="property-card">
+                    <div class="property-image">
+                        <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400&h=300&fit=crop" alt="Mountain Cabin">
+                        <span class="property-badge">Cozy</span>
+                        <button class="wishlist-btn">♡</button>
+                    </div>
+                    <div class="property-info">
+                        <h3>SUNRISE LODGING</h3>
+                        <p class="property-location">📍 Baybay, San Pedro SDS</p>
+                        <div class="property-amenities">
+                            <span>🛏️ 2 Beds</span>
+                            <span>🛁 1 Bath</span>
+                            <span>👥 4 Guests</span>
+                        </div>
+                        <div class="property-rating">
+                            <span class="rating">⭐ 4.7</span>
+                            <span class="reviews">(76 reviews)</span>
+                        </div>
+                        <div class="property-price">
+                            <span class="price">$195</span>
+                            <span class="per-night">/ night</span>
+                        </div>
+                        <button class="btn btn-primary book-property-btn">Book Now</button>
+                    </div>
+                </div>
+
+                <!-- Property Card 4 -->
+                <div class="property-card">
+                    <div class="property-image">
+                        <img src="C:\ezstay\20171112_192329.jpg">
+                        <span class="property-badge">New</span>
+                        <button class="wishlist-btn">♡</button>
+                    </div>
+                    <div class="property-info">
+                        <h3>Urban Studio Loft</h3>
+                        <p class="property-location">📍 San Francisco, CA</p>
+                        <div class="property-amenities">
+                            <span>🛏️ 1 Bed</span>
+                            <span>🛁 1 Bath</span>
+                            <span>👥 2 Guests</span>
+                        </div>
+                        <div class="property-rating">
+                            <span class="rating">⭐ 4.6</span>
+                            <span class="reviews">(54 reviews)</span>
+                        </div>
+                        <div class="property-price">
+                            <span class="price">$120</span>
+                            <span class="per-night">/ night</span>
+                        </div>
+                        <button class="btn btn-primary book-property-btn">Book Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Section -->
+    <section id="booking" class="booking-section">
+        <div class="container">
+            <h2 class="section-title">Book Your Stay</h2>
+            <p class="section-subtitle">Complete your reservation in a few simple steps</p>
+            
+            <div class="booking-container">
+                <form class="booking-form" id="bookingForm">
+                    <div class="form-section">
+                        <h3>Reservation Details</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="property-select">Select Property</label>
+                                <select id="property-select" required>
+                                    <option value="">Choose a property...</option>
+                                    <option value="modern-apartment">Modern Downtown Apartment - $150/night</option>
+                                    <option value="beach-villa">Luxury Beach Villa - $280/night</option>
+                                    <option value="mountain-cabin">Mountain Retreat Cabin - $195/night</option>
+                                    <option value="urban-loft">Urban Studio Loft - $120/night</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="booking-checkin">Check-in Date</label>
+                                <input type="date" id="booking-checkin" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="booking-checkout">Check-out Date</label>
+                                <input type="date" id="booking-checkout" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="booking-guests">Number of Guests</label>
+                                <select id="booking-guests" required>
+                                    <option value="1">1 Guest</option>
+                                    <option value="2" selected>2 Guests</option>
+                                    <option value="3">3 Guests</option>
+                                    <option value="4">4 Guests</option>
+                                    <option value="5">5 Guests</option>
+                                    <option value="6">6+ Guests</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Personal Information</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="first-name">First Name</label>
+                                <input type="text" id="first-name" placeholder="John" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="last-name">Last Name</label>
+                                <input type="text" id="last-name" placeholder="Doe" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" placeholder="john@example.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" placeholder="+1 (555) 000-0000" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Special Requests</h3>
+                        <div class="form-group">
+                            <label for="requests">Additional Notes (Optional)</label>
+                            <textarea id="requests" rows="4" placeholder="Any special requests or information you'd like to share..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Payment</h3>
+                        <div class="form-group">
+                            <label for="card-name">Name on Card</label>
+                            <input type="text" id="card-name" placeholder="John Doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="card-number">Card Number</label>
+                            <input type="text" id="card-number" placeholder="1234 5678 9012 3456" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="expiry">Expiry Date</label>
+                                <input type="text" id="expiry" placeholder="MM/YY" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cvv">CVV</label>
+                                <input type="text" id="cvv" placeholder="123" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="booking-summary">
+                        <h3>Booking Summary</h3>
+                        <div class="summary-row">
+                            <span>Property:</span>
+                            <span id="summary-property">Not selected</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Nights:</span>
+                            <span id="summary-nights">0</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Rate per night:</span>
+                            <span id="summary-rate">$0</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Service fee:</span>
+                            <span id="summary-fee">$0</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total:</span>
+                            <span id="summary-total">$0</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-large">Complete Booking</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section class="why-us">
+        <div class="container">
+            <h2 class="section-title">Why Choose EZStay?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3>Secure Booking</h3>
+                    <p>Your payments are protected with industry-leading encryption</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💰</div>
+                    <h3>Best Price Guarantee</h3>
+                    <p>Find a lower price? We'll match it and give you 10% off</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🕐</div>
+                    <h3>24/7 Support</h3>
+                    <p>Our team is available around the clock to assist you</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">✨</div>
+                    <h3>Quality Verified</h3>
+                    <p>All properties are inspected and verified for quality</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">Get in Touch</h2>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>Contact Information</h3>
+                    <p>📍 123 Travel Street, New York, NY 10001</p>
+                    <p>📞 +1 (555) 123-4567</p>
+                    <p>✉️ support@ezstay.com</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link">Facebook</a>
+                        <a href="#" class="social-link">Twitter</a>
+                        <a href="#" class="social-link">Instagram</a>
+                    </div>
+                </div>
+                <form class="contact-form">
+                    <div class="form-group">
+                        <label for="contact-name">Your Name</label>
+                        <input type="text" id="contact-name" placeholder="Enter your name">
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-email">Email</label>
+                        <input type="email" id="contact-email" placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-message">Message</label>
+                        <textarea id="contact-message" rows="4" placeholder="How can we help you?"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>EZStay</h4>
+                    <p>Your home away from home. Book comfortable and affordable accommodations worldwide.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <a href="#home">Home</a>
+                    <a href="#properties">Properties</a>
+                    <a href="#booking">Book Now</a>
+                    <a href="#contact">Contact</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <a href="#">FAQ</a>
+                    <a href="#">Cancellation Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Privacy Policy</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Newsletter</h4>
+                    <p>Subscribe for exclusive deals</p>
+                    <div class="newsletter-form">
+                        <input type="email" placeholder="Your email">
+                        <button class="btn btn-primary">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 EZStay. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Booking Confirmation Modal -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <div class="modal-icon">✅</div>
+            <h2>Booking Confirmed!</h2>
+            <p>Thank you for choosing EZStay. Your reservation has been successfully booked.</p>
+            <p class="confirmation-number">Confirmation #: <span id="confirmationNumber">EZS-000000</span></p>
+            <p>A confirmation email has been sent to your email address.</p>
+            <button class="btn btn-primary" onclick="closeModal()">Done</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

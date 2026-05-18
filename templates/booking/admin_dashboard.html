@@ -1,0 +1,115 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - EZStay</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <section class="booking-section" style="min-height:100vh; padding:40px 0;">
+        <div class="container" style="max-width:1100px; width:100%;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; gap:12px; flex-wrap:wrap;">
+                <h2 class="section-title" style="margin:0;">Admin Dashboard</h2>
+                <a class="btn btn-outline" href="{% url 'home' %}">Back to Home</a>
+            </div>
+
+            {% if messages %}
+                <div style="margin-bottom:16px;">
+                    {% for message in messages %}
+                        <div class="message {{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="property-grid" style="margin-bottom:24px;">
+                <div class="property-card" style="padding:18px;">
+                    <h3 style="margin-bottom:8px;">Total Bookings</h3>
+                    <p style="font-size:30px; font-weight:700; margin:0;">{{ total_bookings }}</p>
+                </div>
+                <div class="property-card" style="padding:18px;">
+                    <h3 style="margin-bottom:8px;">Paid Bookings</h3>
+                    <p style="font-size:30px; font-weight:700; margin:0; color:#047857;">{{ paid_bookings }}</p>
+                </div>
+                <div class="property-card" style="padding:18px;">
+                    <h3 style="margin-bottom:8px;">Unpaid Bookings</h3>
+                    <p style="font-size:30px; font-weight:700; margin:0; color:#b91c1c;">{{ unpaid_bookings }}</p>
+                </div>
+                <div class="property-card" style="padding:18px;">
+                    <h3 style="margin-bottom:8px;">Revenue Collected</h3>
+                    <p style="font-size:30px; font-weight:700; margin:0;">${{ total_revenue }}</p>
+                </div>
+            </div>
+
+            <div class="booking-form" style="margin-bottom:24px;">
+                <h3 style="margin-bottom:14px;">Bookings by Property</h3>
+                <div style="overflow-x:auto;">
+                    <table style="width:100%; border-collapse:collapse;">
+                        <thead>
+                            <tr>
+                                <th style="text-align:left; padding:10px; border-bottom:1px solid #e5e7eb;">Property</th>
+                                <th style="text-align:left; padding:10px; border-bottom:1px solid #e5e7eb;">Total</th>
+                                <th style="text-align:left; padding:10px; border-bottom:1px solid #e5e7eb;">Paid</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in property_breakdown %}
+                                <tr>
+                                    <td style="padding:10px; border-bottom:1px solid #f1f5f9;">{{ row.property_name }}</td>
+                                    <td style="padding:10px; border-bottom:1px solid #f1f5f9;">{{ row.total }}</td>
+                                    <td style="padding:10px; border-bottom:1px solid #f1f5f9;">{{ row.paid }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="3" style="padding:12px;">No bookings found.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="booking-form">
+                <h3 style="margin-bottom:14px;">Recent Bookings</h3>
+                <div style="overflow-x:auto;">
+                    <table style="width:100%; border-collapse:collapse;">
+                        <thead>
+                            <tr>
+                                <th style="text-align:left; padding:10px; border-bottom:1px solid #e5e7eb;">Created</th>
+                                <th style="text-align:left; padding:10px; border-bottom:1px solid #e5e7eb;">Guest</th>
+                                <th style="text-align:left; padding:10px; border-bottom:1px solid #e5e7eb;">Property</th>
+                                <th style="text-align:left; padding:10px; border-bottom:1px solid #e5e7eb;">Dates</th>
+                                <th style="text-align:left; padding:10px; border-bottom:1px solid #e5e7eb;">Total</th>
+                                <th style="text-align:left; padding:10px; border-bottom:1px solid #e5e7eb;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for booking in recent_bookings %}
+                                <tr>
+                                    <td style="padding:10px; border-bottom:1px solid #f1f5f9;">{{ booking.created_at|date:"Y-m-d H:i" }}</td>
+                                    <td style="padding:10px; border-bottom:1px solid #f1f5f9;">{{ booking.user.username }}</td>
+                                    <td style="padding:10px; border-bottom:1px solid #f1f5f9;">{{ booking.get_property_slug_display }}</td>
+                                    <td style="padding:10px; border-bottom:1px solid #f1f5f9;">{{ booking.checkin }} → {{ booking.checkout }}</td>
+                                    <td style="padding:10px; border-bottom:1px solid #f1f5f9;">${{ booking.total }}</td>
+                                    <td style="padding:10px; border-bottom:1px solid #f1f5f9;">
+                                        {% if booking.is_paid %}
+                                            <span style="color:#047857; font-weight:600;">Paid</span>
+                                        {% else %}
+                                            <span style="color:#b91c1c; font-weight:600;">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="6" style="padding:12px;">No recent bookings available.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
