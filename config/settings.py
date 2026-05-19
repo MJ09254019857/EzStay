@@ -87,5 +87,6 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 PAYMONGO_SECRET_KEY = os.environ.get('PAYMONGO_SECRET_KEY', '')
 PAYMONGO_PUBLIC_KEY = os.environ.get('PAYMONGO_PUBLIC_KEY', '')
+APP_BASE_URL = os.environ.get('APP_BASE_URL', 'https://ezstay.online')  # ← bagong line
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
