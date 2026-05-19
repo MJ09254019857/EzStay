@@ -47,11 +47,10 @@ def _paymongo_headers():
     }
 
 
-def _paymongo_create_checkout_session(booking, payment_method_type):
+def _paymongo_create_checkout_session(booking):
     """
     Call the PayMongo Checkout Sessions API and return (checkout_url, reference_number).
-
-    payment_method_type must be one of: 'gcash', 'paymaya', 'card'
+    Shows all available payment methods (GCash, Maya, Card, QR Ph).
     """
     headers = _paymongo_headers()
     if not headers:
@@ -72,7 +71,8 @@ def _paymongo_create_checkout_session(booking, payment_method_type):
                         "quantity": 1,
                     }
                 ],
-                "payment_method_types": [payment_method_type],
+                # ✅ ALL payment methods — PayMongo will show whichever are available
+                "payment_method_types": ["gcash", "paymaya", "card", "qrph"],
                 "success_url": success_url,
                 "cancel_url": cancel_url,
                 "description": f"Booking for {booking.get_property_slug_display()}",
@@ -192,34 +192,18 @@ def create_booking(request):
 def payment_view(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id, user=request.user)
 
-    # Map form value → PayMongo payment_method_type
-    payment_method_map = {
-        "gcash":   "gcash",
-        "maya":    "paymaya",
-        "paymaya": "paymaya",
-        "card":    "card",
-    }
-
     if booking.is_paid:
         messages.info(request, "This booking has already been paid.")
         return redirect("booking_success", booking_id=booking.id)
 
     if request.method == "POST":
-        payment_method  = request.POST.get("payment_method", "").strip().lower()
-        paymongo_method = payment_method_map.get(payment_method)
-
-        if not paymongo_method:
-            messages.error(request, "Please select a valid payment method.")
-            return redirect("payment", booking_id=booking.id)
-
+        # ✅ No need to pick payment method — PayMongo shows all options
         try:
-            checkout_url, reference_number = _paymongo_create_checkout_session(
-                booking, paymongo_method
-            )
+            checkout_url, reference_number = _paymongo_create_checkout_session(booking)
             if reference_number:
                 booking.payment_reference = reference_number
                 booking.save(update_fields=["payment_reference"])
-            return redirect(checkout_url)   # <-- redirect to real PayMongo page
+            return redirect(checkout_url)
         except RuntimeError as exc:
             messages.error(request, f"Unable to start PayMongo checkout. {exc}")
             return redirect("payment", booking_id=booking.id)
