@@ -1,11 +1,17 @@
 from datetime import date
 from decimal import Decimal
+import base64
+import json
+import socket
+from urllib import error as urlerror
+from urllib import request as urlrequest
 from uuid import uuid4
 
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q, Sum
+from django.conf import settings
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import SignUpForm
@@ -17,8 +23,98 @@ PROPERTY_RATES = {
     "beach-villa": Decimal("500.00"),
     "sunrise": Decimal("195.00"),
     "urban-loft": Decimal("120.00"),
+    "riverside-garden": Decimal("350.00"),
 }
 
+# ============================================================
+#  PAYMONGO INTEGRATION
+# ============================================================
+
+PAYMONGO_CHECKOUT_URL = "https://api.paymongo.com/v1/checkout_sessions"
+_NO_PROXY_OPENER = urlrequest.build_opener(urlrequest.ProxyHandler({}))
+
+
+def _paymongo_headers():
+    """Build the Authorization header using the secret key from settings."""
+    secret_key = settings.PAYMONGO_SECRET_KEY
+    if not secret_key:
+        return None
+    encoded = base64.b64encode(f"{secret_key}:".encode("utf-8")).decode("utf-8")
+    return {
+        "accept": "application/json",
+        "content-type": "application/json",
+        "authorization": f"Basic {encoded}",
+    }
+
+
+def _paymongo_create_checkout_session(booking, payment_method_type):
+    """
+    Call the PayMongo Checkout Sessions API and return (checkout_url, reference_number).
+
+    payment_method_type must be one of: 'gcash', 'paymaya', 'card'
+    """
+    headers = _paymongo_headers()
+    if not headers:
+        raise RuntimeError("PAYMONGO_SECRET_KEY is missing.")
+
+    amount_centavos = int((booking.total * 100).quantize(Decimal("1")))
+    success_url = f"{settings.APP_BASE_URL}/book/{booking.id}/success/"
+    cancel_url  = f"{settings.APP_BASE_URL}/book/{booking.id}/payment/"
+
+    payload = {
+        "data": {
+            "attributes": {
+                "line_items": [
+                    {
+                        "currency": "PHP",
+                        "amount": amount_centavos,
+                        "name": f"EZStay Booking #{booking.id}",
+                        "quantity": 1,
+                    }
+                ],
+                "payment_method_types": [payment_method_type],
+                "success_url": success_url,
+                "cancel_url": cancel_url,
+                "description": f"Booking for {booking.get_property_slug_display()}",
+                "metadata": {
+                    "booking_id": str(booking.id),
+                    "user_id": str(booking.user_id),
+                },
+            }
+        }
+    }
+
+    req = urlrequest.Request(
+        PAYMONGO_CHECKOUT_URL,
+        data=json.dumps(payload).encode("utf-8"),
+        headers=headers,
+        method="POST",
+    )
+
+    attempts = 2
+    last_error = None
+    for _ in range(attempts):
+        try:
+            with _NO_PROXY_OPENER.open(req, timeout=20) as response:
+                data = json.loads(response.read().decode("utf-8"))
+                attrs = data.get("data", {}).get("attributes", {})
+                checkout_url = attrs.get("checkout_url")
+                reference_number = attrs.get("reference_number", "")
+                if not checkout_url:
+                    raise RuntimeError("PayMongo checkout URL was not returned.")
+                return checkout_url, reference_number
+        except urlerror.HTTPError as exc:
+            body = exc.read().decode("utf-8", errors="ignore")
+            raise RuntimeError(f"PayMongo API error ({exc.code}): {body}")
+        except (urlerror.URLError, socket.gaierror) as exc:
+            last_error = exc
+
+    reason = getattr(last_error, "reason", last_error)
+    raise RuntimeError(f"Could not reach PayMongo: {reason}")
+
+# ============================================================
+#  VIEWS
+# ============================================================
 
 def home(request):
     return render(request, "booking/home.html")
@@ -47,11 +143,11 @@ def create_booking(request):
         return redirect("home")
 
     property_slug = request.POST.get("property_slug", "")
-    checkin_raw = request.POST.get("checkin", "")
-    checkout_raw = request.POST.get("checkout", "")
+    checkin_raw   = request.POST.get("checkin", "")
+    checkout_raw  = request.POST.get("checkout", "")
 
     try:
-        checkin = date.fromisoformat(checkin_raw)
+        checkin  = date.fromisoformat(checkin_raw)
         checkout = date.fromisoformat(checkout_raw)
     except ValueError:
         messages.error(request, "Please provide valid check-in and check-out dates.")
@@ -65,11 +161,11 @@ def create_booking(request):
         messages.error(request, "Check-out date must be after check-in date.")
         return redirect("home")
 
-    nights = (checkout - checkin).days
-    rate = PROPERTY_RATES[property_slug]
-    subtotal = rate * nights
+    nights      = (checkout - checkin).days
+    rate        = PROPERTY_RATES[property_slug]
+    subtotal    = rate * nights
     service_fee = (subtotal * Decimal("0.10")).quantize(Decimal("0.01"))
-    total = subtotal + service_fee
+    total       = subtotal + service_fee
 
     booking = Booking.objects.create(
         user=request.user,
@@ -95,58 +191,38 @@ def create_booking(request):
 @login_required
 def payment_view(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id, user=request.user)
-    payment_methods = ["gcash", "maya", "card"]
+
+    # Map form value → PayMongo payment_method_type
+    payment_method_map = {
+        "gcash":   "gcash",
+        "maya":    "paymaya",
+        "paymaya": "paymaya",
+        "card":    "card",
+    }
 
     if booking.is_paid:
         messages.info(request, "This booking has already been paid.")
         return redirect("booking_success", booking_id=booking.id)
 
     if request.method == "POST":
-        payment_method = request.POST.get("payment_method", "").strip().lower()
+        payment_method  = request.POST.get("payment_method", "").strip().lower()
+        paymongo_method = payment_method_map.get(payment_method)
 
-        if payment_method not in payment_methods:
+        if not paymongo_method:
             messages.error(request, "Please select a valid payment method.")
             return redirect("payment", booking_id=booking.id)
 
-        if payment_method in ("gcash", "maya"):
-            wallet_number = request.POST.get("wallet_number", "").replace(" ", "")
-            if not wallet_number.isdigit() or len(wallet_number) != 11 or not wallet_number.startswith("09"):
-                messages.error(request, "Please enter a valid mobile wallet number (e.g., 09XXXXXXXXX).")
-                return redirect("payment", booking_id=booking.id)
-
-        if payment_method == "card":
-            card_name = request.POST.get("card_name", "").strip()
-            card_number = request.POST.get("card_number", "").replace(" ", "")
-            expiry = request.POST.get("expiry", "").strip()
-            cvv = request.POST.get("cvv", "").strip()
-
-            if not card_name or len(card_name) < 3:
-                messages.error(request, "Please enter the cardholder name.")
-                return redirect("payment", booking_id=booking.id)
-
-            if not card_number.isdigit() or len(card_number) < 13 or len(card_number) > 19:
-                messages.error(request, "Please enter a valid card number.")
-                return redirect("payment", booking_id=booking.id)
-
-            if len(expiry) != 5 or expiry[2] != "/":
-                messages.error(request, "Expiry format must be MM/YY.")
-                return redirect("payment", booking_id=booking.id)
-
-            mm, yy = expiry.split("/")
-            if not (mm.isdigit() and yy.isdigit() and 1 <= int(mm) <= 12):
-                messages.error(request, "Please enter a valid expiry date.")
-                return redirect("payment", booking_id=booking.id)
-
-            if not cvv.isdigit() or len(cvv) not in (3, 4):
-                messages.error(request, "Please enter a valid CVV.")
-                return redirect("payment", booking_id=booking.id)
-
-        booking.is_paid = True
-        booking.payment_reference = f"{payment_method.upper()}-{uuid4().hex[:10].upper()}"
-        booking.save(update_fields=["is_paid", "payment_reference"])
-
-        messages.success(request, f"Payment successful! Reference: {booking.payment_reference}")
-        return redirect("booking_success", booking_id=booking.id)
+        try:
+            checkout_url, reference_number = _paymongo_create_checkout_session(
+                booking, paymongo_method
+            )
+            if reference_number:
+                booking.payment_reference = reference_number
+                booking.save(update_fields=["payment_reference"])
+            return redirect(checkout_url)   # <-- redirect to real PayMongo page
+        except RuntimeError as exc:
+            messages.error(request, f"Unable to start PayMongo checkout. {exc}")
+            return redirect("payment", booking_id=booking.id)
 
     return render(request, "booking/payment.html", {"booking": booking})
 
@@ -156,8 +232,10 @@ def booking_success(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id, user=request.user)
 
     if not booking.is_paid:
-        messages.warning(request, "Please complete payment to confirm this booking.")
-        return redirect("payment", booking_id=booking.id)
+        booking.is_paid = True
+        if not booking.payment_reference:
+            booking.payment_reference = f"PAYMONGO-{uuid4().hex[:10].upper()}"
+        booking.save(update_fields=["is_paid", "payment_reference"])
 
     return render(request, "booking/booking_success.html", {"booking": booking})
 
@@ -168,11 +246,11 @@ def admin_dashboard(request):
         messages.error(request, "You are not authorized to access the admin dashboard.")
         return redirect("home")
 
-    bookings = Booking.objects.select_related("user")
+    bookings       = Booking.objects.select_related("user")
     total_bookings = bookings.count()
-    paid_bookings = bookings.filter(is_paid=True).count()
+    paid_bookings  = bookings.filter(is_paid=True).count()
     unpaid_bookings = total_bookings - paid_bookings
-    total_revenue = bookings.filter(is_paid=True).aggregate(total=Sum("total"))["total"] or Decimal("0.00")
+    total_revenue  = bookings.filter(is_paid=True).aggregate(total=Sum("total"))["total"] or Decimal("0.00")
 
     property_breakdown = (
         bookings.values("property_slug")
@@ -190,11 +268,11 @@ def admin_dashboard(request):
         request,
         "booking/admin_dashboard.html",
         {
-            "total_bookings": total_bookings,
-            "paid_bookings": paid_bookings,
-            "unpaid_bookings": unpaid_bookings,
-            "total_revenue": total_revenue,
+            "total_bookings":    total_bookings,
+            "paid_bookings":     paid_bookings,
+            "unpaid_bookings":   unpaid_bookings,
+            "total_revenue":     total_revenue,
             "property_breakdown": property_breakdown,
-            "recent_bookings": recent_bookings,
+            "recent_bookings":   recent_bookings,
         },
     )
