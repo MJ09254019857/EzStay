@@ -38,7 +38,7 @@
                 </div>
                 <div class="property-card" style="padding:18px;">
                     <h3 style="margin-bottom:8px;">Revenue Collected</h3>
-                    <p style="font-size:30px; font-weight:700; margin:0;">${{ total_revenue }}</p>
+                    <p style="font-size:30px; font-weight:700; margin:0;">₱{{ total_revenue }}</p>
                 </div>
             </div>
 
@@ -91,7 +91,7 @@
                                     <td style="padding:10px; border-bottom:1px solid #f1f5f9;">{{ booking.user.username }}</td>
                                     <td style="padding:10px; border-bottom:1px solid #f1f5f9;">{{ booking.get_property_slug_display }}</td>
                                     <td style="padding:10px; border-bottom:1px solid #f1f5f9;">{{ booking.checkin }} → {{ booking.checkout }}</td>
-                                    <td style="padding:10px; border-bottom:1px solid #f1f5f9;">${{ booking.total }}</td>
+                                    <td style="padding:10px; border-bottom:1px solid #f1f5f9;">₱{{ booking.total }}</td>
                                     <td style="padding:10px; border-bottom:1px solid #f1f5f9;">
                                         {% if booking.is_paid %}
                                             <span style="color:#047857; font-weight:600;">Paid</span>
